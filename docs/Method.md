@@ -11,7 +11,9 @@ JCLPCB database from here:
 https://yaqwsx.github.io/jlcparts/
 
 ```shell
-wget https://yaqwsx.github.io/jlcparts/data/cache.zip https://yaqwsx.github.io/jlcparts/data/cache.z0{1..9} https://yaqwsx.github.io/jlcparts/data/cache.z1{0..9}
+wget https://yaqwsx.github.io/jlcparts/data/cache.zip \
+  https://yaqwsx.github.io/jlcparts/data/cache.z0{1..9} \
+  https://yaqwsx.github.io/jlcparts/data/cache.z1{0..9}
 7z x cache.zip
 ```
 

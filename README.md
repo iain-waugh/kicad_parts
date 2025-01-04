@@ -5,7 +5,7 @@ Because a good part library is invaluable when you're designing circuit boards.
 ## Fields
 
 ```
-Part ID,Text Description,<Specifics>,Package,Height,Weight,RoHS,Symbols,Footprints,Manufacturers,MPNs,Prices,Datasheet
+Part ID,Text Description,<Specifics>,Package,Height,Weight,Temperature Range,Symbols,Footprints,Manufacturers,MPNs,Prices,Datasheet,RoHS
 ```
 
 Where `Specifics` are things directly related to the type of part, like "Voltage", "Current", "Power", etc.

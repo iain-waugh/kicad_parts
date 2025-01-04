@@ -6,7 +6,7 @@ Look at the number of parts in a large supplier's database and arrange part numb
 
 ## Data source:
 
-JCLPCB database from here:
+JCLPCB parts database can be seen here (take 10-15 mins to update the component library):
 
 https://yaqwsx.github.io/jlcparts/
 
@@ -53,11 +53,43 @@ count_series.to_csv('category_counts.csv')
 
 Then manually edit and group the results in `category_counts.csv`.
 
-## Categories Defined
+## Part Numbering Analysis
 
-After a bit of data wrangling and some manual sorting/arranging, I have come up with:
+After a bit of data wrangling and analysis, I note that JLC has:
 
-* TBD
+* 14,493 of all types/packages of resistors for yageo
+
+* 11,347 of all types/packages of resistors for Uni-Royal
+
+* 47,914 connectors
+
+* ~50,000 ICs
+
+Using 5 digits for a number code and an emergency "1" prefix leaves ample room for expansion.
+
+All parts/components shall start with "`P`", followed by the IEEE 200-1975 for subcategory.
+
+So:
+
+* Resistor Naming is : PR1-nnnnn
+
+* Resistor Network Naming is : PRN-nnnnn
+
+* Capacitor Naming is : PC1-nnnnn
+
+* Capacitor Network Naming is : PCN-nnnnn
+
+* Diode Naming is : PD1-nnnnn
+
+* Connector Naming is : PJ1-nnnnn
+
+* IC naming is : PU1-nnnnn
+
+* Crystal Naming is : PX1-nnnnn
+
+* Transistor Naming is : PY1-nnnnn
+
+* etc.
 
 ## Adding Data
 

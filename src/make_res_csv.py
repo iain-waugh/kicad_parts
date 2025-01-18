@@ -12,6 +12,9 @@ This script deals with 3 different representations of values:
     Numeric value   (number): 4.7, 10000000, 1500, etc.
 """
 import re
+import csv
+
+import pandas as pd
 
 def schem2text(value):
     """Convert 4k7 to 4.7k, 1R to 1, 22M to 22M etc."""
@@ -87,27 +90,53 @@ def gen_range(min_val, max_val, value_list):
                     result.append(sch_num)
     return result
 
-# Define the data
-heading = [
-    'Part ID',
-    'Description',
-    'Value',
-    'Power',
-    'Tolerance',
-    'Working Voltage',
-    'Package',
-    'Height',
-    'Weight',
-    'Min ℃',
-    'Max ℃',
-    'Symbols',
-    'Footprints',
-    'Manufacturers',
-    'MPNs',
-    'Prices',
-    'Datasheet',
-    'RoHS'
-    ]
+def yageo_code(size,tol,value,power):
+    tol_lookup = {
+        "0.1%" : "B",
+        "0.5%" : "D",
+        "1%" : "F",
+        "5%" : "J",
+        "10%" : "K",
+        "20%" : "M",
+        }
+    tol_code = tol_lookup[tol]
+    
+    if size in ["2010"]:
+        packaging_code = "K"
+    else:
+        packaging_code = "R"
+
+    if power == "1/8W":
+        reel_code = "7W"
+    else:
+        reel_code = "07"
+    
+    code = "RC" + size + tol_code + packaging_code + "-" + reel_code + value.upper().rstrip("0") + "L"
+    
+    return code
+
+
+# # Define the data
+# heading = [
+#     'Part ID',
+#     'Description',
+#     'Value',
+#     'Power',
+#     'Tolerance',
+#     'Package',
+#     'Height',
+#     'Weight',
+#     'Min ℃',
+#     'Max ℃',
+#     'Working Voltage',
+#     'Symbols',
+#     'Footprints',
+#     'Manufacturers',
+#     'MPNs',
+#     'Prices',
+#     'Datasheet',
+#     'RoHS'
+#     ]
 
 e24 = ["1.0", "1.1", "1.2", "1.3", "1.5", "1.6", "1.8", "2.0", "2.2", "2.4", "2.7", "3.0", "3.3", "3.6", "3.9", "4.3", "4.7", "5.1", "5.6", "6.2", "6.8", "7.5", "8.2", "9.1"]
 e96 = [
@@ -125,43 +154,31 @@ e96 = [
 # Define ranges of Yageo resistors
 #   From Table 2 of Yageo RC_L series datasheet
 ranges = {
-    "0075,1/50W,5%,10V,-55,125": ["10R","1M"],
-    "0075,1/50W,1%,10V,-55,125": ["10R","1M"],
-
-    "0100,1/32W,5%,15V,-55,125": ["1R0","22M"],
-    "0100,1/32W,1%,15V,-55,125": ["1R0","10M"],
-    "0100,1/32W,0.5%,15V,-55,125": ["33R","470k"],
-
-    "0201,1/20W,5%,25V,-55,125": ["1R0","10M"],
-    "0201,1/20W,1%,25V,-55,125": ["1R0","10M"],
-    "0201,1/20W,0.5%,25V,-55,125": ["10R","1M"],
-    "0201,1/20W,0.1%,25V,-55,125": ["10R","1M"],
-
-    "0402,1/16W,5%,50V,-55,155": ["1R0","10M"],
+    # ---------------------------------------------------
+    # Most common parts appear first in the results
     "0402,1/16W,1%,50V,-55,155": ["1R0","10M"],
-    "0402,1/16W,0.5%,50V,-55,155": ["10R","1M"],
+    "0402,1/16W,5%,50V,-55,155": ["1R0","10M"],
     "0402,1/16W,0.1%,50V,-55,155": ["10R","1M"],
-    "0402,1/8W,5%,50V,-55,155": ["1R0","1M"],
-    "0402,1/8W,1%,50V,-55,155": ["1R0","1M"],
 
-    "0603,1/10W,5%,75V,-55,155": ["1R","22M"],
     "0603,1/10W,1%,75V,-55,155": ["1R","10M"],
-    "0603,1/10W,0.5%,75V,-55,155": ["10R","1M"],
+    "0603,1/10W,5%,75V,-55,155": ["1R","22M"],
     "0603,1/10W,0.1%,75V,-55,155": ["10R","1M"],
-    "0603,1/5W,5%,75V,-55,155": ["1R","1M"],
-    "0603,1/5W,1%,75V,-55,155": ["1R","1M"],
 
-    "0805,1/8W,5%,150V,-55,155": ["1R","100M"],
     "0805,1/8W,1%,150V,-55,155": ["1R","10M"],
-    "0805,1/8W,0.5%,150V,-55,155": ["10R","1M"],
+    "0805,1/8W,5%,150V,-55,155": ["1R","100M"],
     "0805,1/8W,0.1%,150V,-55,155": ["10R","1M"],
     "0805,1/8W,10%,150V,-55,155": ["24M","100M"],
     "0805,1/8W,20%,150V,-55,155": ["24M","100M"],
-    "0805,1/4W,5%,150V,-55,155": ["1R","1M"],
-    "0805,1/4W,1%,150V,-55,155": ["1R","1M"],
 
-    "1206,1/4W,5%,200V,-55,155": ["1R","100M"],
+    # ---------------------------------------------------
+    # Less comonly used parts
+    "0201,1/20W,1%,25V,-55,125": ["1R0","10M"],
+    "0201,1/20W,5%,25V,-55,125": ["1R0","10M"],
+    "0201,1/20W,0.5%,25V,-55,125": ["10R","1M"],
+    "0201,1/20W,0.1%,25V,-55,125": ["10R","1M"],
+
     "1206,1/4W,1%,200V,-55,155": ["1R","10M"],
+    "1206,1/4W,5%,200V,-55,155": ["1R","100M"],
     "1206,1/4W,0.5%,200V,-55,155": ["10R","1M"],
     "1206,1/4W,0.1%,200V,-55,155": ["10R","1M"],
     "1206,1/4W,10%,200V,-55,155": ["24M","100M"],
@@ -169,31 +186,53 @@ ranges = {
     "1206,1/2W,5%,200V,-55,155": ["1R","1M"],
     "1206,1/2W,1%,200V,-55,155": ["1R","1M"],
 
-    "1210,1/2W,5%,200V,-55,155": ["1R","22M"],
     "1210,1/2W,1%,200V,-55,155": ["1R","10M"],
+    "1210,1/2W,5%,200V,-55,155": ["1R","22M"],
     "1210,1/2W,0.5%,200V,-55,155": ["10R","1M"],
     "1210,1/2W,0.1%,200V,-55,155": ["10R","1M"],
 
     "1218,1W,5%,200V,-55,155": ["1R","1M"],
     "1218,1W,1%,200V,-55,155": ["1R","1M"],
-    "1218,1W,0.5%,200V,-55,155": ["10R","1M"],
     "1218,1W,0.1%,200V,-55,155": ["10R","1M"],
 
     "2010,3/4W,5%,200V,-55,155": ["1R","22M"],
     "2010,3/4W,1%,200V,-55,155": ["1R","10M"],
-    "2010,3/4W,0.5%,200V,-55,155": ["10R","1M"],
     "2010,3/4W,0.1%,200V,-55,155": ["10R","1M"],
 
     "2512,1W,5%,200V,-55,155": ["1R","22M"],
     "2512,1W,1%,200V,-55,155": ["1R","10M"],
-    "2512,1W,0.5%,200V,-55,155": ["10R","1M"],
     "2512,1W,0.1%,200V,-55,155": ["10R","1M"],
     "2512,2W,5%,200V,-55,155": ["1R","1M"],
     "2512,2W,1%,200V,-55,155": ["1R","11M"]
+
+    # ---------------------------------------------------
+    # Unusual parts
+#    "0402,1/16W,0.5%,50V,-55,155": ["10R","1M"],
+#    "0402,1/8W,5%,50V,-55,155": ["1R0","1M"],
+#    "0402,1/8W,1%,50V,-55,155": ["1R0","1M"],
+#    "0603,1/10W,0.5%,75V,-55,155": ["10R","1M"],
+#    "0603,1/5W,5%,75V,-55,155": ["1R","1M"],
+#    "0603,1/5W,1%,75V,-55,155": ["1R","1M"],
+#    "0805,1/8W,0.5%,150V,-55,155": ["10R","1M"],
+#    "0805,1/4W,5%,150V,-55,155": ["1R","1M"],
+#    "0805,1/4W,1%,150V,-55,155": ["1R","1M"],
+#    "1218,1W,0.5%,200V,-55,155": ["10R","1M"],
+#    "2010,3/4W,0.5%,200V,-55,155": ["10R","1M"],
+#    "2512,1W,0.5%,200V,-55,155": ["10R","1M"],
+
+# There's a footprint for these, but they're low priority
+#    "0100,1/32W,5%,15V,-55,125": ["1R0","22M"],
+#    "0100,1/32W,1%,15V,-55,125": ["1R0","10M"],
+#    "0100,1/32W,0.5%,15V,-55,125": ["33R","470k"],
+
+# Do you really want these miniscule parts?
+# KiCad doesn't have a footprint for them
+#    "0075,1/50W,5%,10V,-55,125": ["10R","1M"],
+#    "0075,1/50W,1%,10V,-55,125": ["10R","1M"],
     }
 
 heights = {
-    "0075" : "0.10",
+#    "0075" : "0.10",
     "0100" : "0.13",
     "0201" : "0.23",
     "0402" : "0.35",
@@ -208,8 +247,9 @@ heights = {
 
 # Weight will be rounded up/down to a precision of 1mg
 #   so values of 0402 and smaller will be 0
+#   (a through hole via weighs more)
 weights_g = {
-    "0075" : "0.0", # "0.00004",
+#    "0075" : "0.0", # "0.00004",
     "0100" : "0.0", # "0.0001",
     "0201" : "0.0", # "0.0002",
     "0402" : "0.0", # "0.0006",
@@ -222,21 +262,65 @@ weights_g = {
     "2512" : "0.045",
     }
 
+# Use standard KiCad SMD resistor footprints
+footprints_tbl = {
+#    "0075" : "Resistor_SMD:R_unavailable",
+    "0100" : "Resistor_SMD:R_01005_0402Metric;R_01005_0402Metric_Pad0.57x0.30mm_HandSolder",
+    "0201" : "Resistor_SMD:R_0201_0603Metric;R_0201_0603Metric_Pad0.64x0.40mm_HandSolder",
+    "0402" : "Resistor_SMD:R_0402_1005Metric;R_0402_1005Metric_Pad0.72x0.64mm_HandSolder",
+    "0603" : "Resistor_SMD:R_0603_1608Metric;R_0603_1608Metric_Pad0.98x0.95mm_HandSolder",
+    "0805" : "Resistor_SMD:R_0805_2012Metric;R_0805_2012Metric_Pad1.20x1.40mm_HandSolder",
+    "1206" : "Resistor_SMD:R_1206_3216Metric;R_1206_3216Metric_Pad1.30x1.75mm_HandSolder",
+    "1210" : "Resistor_SMD:R_1210_3225Metric;R_1210_3225Metric_Pad1.30x2.65mm_HandSolder",
+    "1218" : "Resistor_SMD:R_1218_3246Metric;R_1218_3246Metric_Pad1.22x4.75mm_HandSolder",
+    "2010" : "Resistor_SMD:R_2010_5025Metric;R_2010_5025Metric_Pad1.40x2.65mm_HandSolder",
+    "2512" : "Resistor_SMD:R_2512_6332Metric;R_2512_6332Metric_Pad1.40x3.35mm_HandSolder",
+    }
+
 part_id_prefix = "PR1-"
 part_id_num = 0
 
-csv_file = []
+csv_columns = [
+    ["Part ID","Description","Value","Tolerance","Power","Package","Height","Weight","Temp (min)","Temp (max)","Voltage","Symbols","Footprints","Manufacturers","MPNs","Prices","Datasheet","RoHS"]
+    ]
+csv_data = csv_columns
+
 for key in ranges:
-    size,power,tol,voltage,minC,maxC = key.split(",")
+    package,power,tol,voltage,minC,maxC = key.split(",")
     min_val,max_val = ranges[key]
     if tol == "5%":
         part_list = gen_range(min_val, max_val, e24)
     else:
         part_list = gen_range(min_val, max_val, e96)
-    height=heights[size]
-    weight=weights_g[size]
-    for part in part_list:
+    height=heights[package]
+    weight=weights_g[package]
+    symbols = "Passives:R"
+    footprints = footprints_tbl[package]
+    prices = "100:0.01;20000:0.0003"
+    datasheet = "https://www.yageo.com/upload/media/product/products/datasheet/rchip/PYu-RC_Group_51_RoHS_L_12.pdf"
+    RoHS = "OK"
+    
+    # if 5%, add Zero Ohm jumper
+    if tol == "5%":
+        value = "0R"
         part_id = str(f"{part_id_prefix}%05d" % part_id_num)
         part_id_num = part_id_num + 1
-        csv_file.append([part_id,size,part,power,tol,voltage,minC,maxC,height,weight])
+        description = " ".join(["RES","CHIP",schem2text(value)+" OHM",tol,power,package])
+        manufacturers = "Yageo"
+        mpns = yageo_code(package, tol, value, power)
+        csv_data.append([part_id,description,value,tol,power,package,height,weight,minC,maxC,voltage,symbols,footprints,manufacturers,mpns,prices,datasheet,RoHS])
+    for value in part_list:
+        part_id = str(f"{part_id_prefix}%05d" % part_id_num)
+        part_id_num = part_id_num + 1
+        description = " ".join(["RES","CHIP",schem2text(value)+" OHM",tol,power,package])
+        manufacturers = "Yageo"
+        mpns = yageo_code(package, tol, value, power)
+        csv_data.append([part_id,description,value,tol,power,package,height,weight,minC,maxC,voltage,symbols,footprints,manufacturers,mpns,prices,datasheet,RoHS])
 
+with open('Resistors.csv', 'w', newline='') as csv_file:
+    writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+    writer.writerows(csv_data)
+
+    # csv_df = pd.DataFrame(csv_data, columns=csv_columns)
+    # csv_df.set_index("Part ID")
+    # csv_df.to_csv("Resistors.csv",header=True)

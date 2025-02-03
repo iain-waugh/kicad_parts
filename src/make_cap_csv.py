@@ -13,6 +13,7 @@ This script deals with 3 different representations of values:
 """
 import re
 import pandas as pd
+import csv
 
 
 def schem2text(value):
@@ -198,7 +199,7 @@ for cap in capacitors:
     package = cap["Package"]
     dielectric = cap["Dielectric"]
     tol = temperatures_tbl[dielectric][2]
-    voltage = cap["Package"]
+    voltage = cap["Voltage"]
     minC = temperatures_tbl[dielectric][0]
     maxC = temperatures_tbl[dielectric][1]
     height = cap["Height"]
@@ -210,7 +211,7 @@ for cap in capacitors:
     RoHS = "OK"
     part_id = str(f"{part_id_prefix}%05d" % part_id_num)
     part_id_num = part_id_num + 1
-    description = " ".join(["CAP", "CHIP", value, tol, package])
+    description = " ".join(["CAP", "CHIP", value, voltage, dielectric, tol, package])
     manufacturers = "Yageo"
     mpns = ""  # yageo_code(package, tol, value, dielectric)
     csv_data.append(
@@ -236,10 +237,10 @@ for cap in capacitors:
         ]
     )
 
-# with open('Resistors.csv', 'w', newline='') as csv_file:
-#     writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
-#     writer.writerows(csv_data)
+with open('Capacitors.csv', 'w', newline='') as csv_file:
+    writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+    writer.writerows(csv_data)
 
-csv_df = pd.DataFrame(csv_data, columns=csv_columns)
-csv_df.set_index("Part ID")
-csv_df.to_csv("Capacitors.csv",header=True)
+#csv_df = pd.DataFrame(csv_data, columns=csv_columns)
+#csv_df.set_index("Part ID")
+#csv_df.to_csv("Capacitors.csv",header=True)

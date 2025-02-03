@@ -93,11 +93,10 @@ So:
 
 ## Adding Data
 
-I want to enter data in CSV format so that it can be tracked in revision control.
+I like to generate data in CSV format so that it can be tracked in revision control.
 
-Convert the CSVs to sqlite using
+Generate the CSVs and convert to sqlite using a shell script.
 
 ```shell
-pip install csvs-to-sqlite
-csvs-to-sqlite ~/path/to/directory kicad_parts.sqlite3
+make_sqlite_db.sh
 ```

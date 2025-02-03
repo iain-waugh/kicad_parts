@@ -63,14 +63,6 @@
 				)
 			)
 		)
-		(property "Dielectric" "*"
-			(at 0 0 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
 		(property "ki_keywords" "cap capacitor"
 			(at 0 0 0)
 			(effects

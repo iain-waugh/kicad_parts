@@ -265,16 +265,16 @@ weights_g = {
 # Use standard KiCad SMD resistor footprints
 footprints_tbl = {
 #    "0075" : "Resistor_SMD:R_unavailable",
-    "0100" : "Resistor_SMD:R_01005_0402Metric;R_01005_0402Metric_Pad0.57x0.30mm_HandSolder",
-    "0201" : "Resistor_SMD:R_0201_0603Metric;R_0201_0603Metric_Pad0.64x0.40mm_HandSolder",
-    "0402" : "Resistor_SMD:R_0402_1005Metric;R_0402_1005Metric_Pad0.72x0.64mm_HandSolder",
-    "0603" : "Resistor_SMD:R_0603_1608Metric;R_0603_1608Metric_Pad0.98x0.95mm_HandSolder",
-    "0805" : "Resistor_SMD:R_0805_2012Metric;R_0805_2012Metric_Pad1.20x1.40mm_HandSolder",
-    "1206" : "Resistor_SMD:R_1206_3216Metric;R_1206_3216Metric_Pad1.30x1.75mm_HandSolder",
-    "1210" : "Resistor_SMD:R_1210_3225Metric;R_1210_3225Metric_Pad1.30x2.65mm_HandSolder",
-    "1218" : "Resistor_SMD:R_1218_3246Metric;R_1218_3246Metric_Pad1.22x4.75mm_HandSolder",
-    "2010" : "Resistor_SMD:R_2010_5025Metric;R_2010_5025Metric_Pad1.40x2.65mm_HandSolder",
-    "2512" : "Resistor_SMD:R_2512_6332Metric;R_2512_6332Metric_Pad1.40x3.35mm_HandSolder",
+    "0100" : "Resistor_SMD:R_01005_0402Metric;Resistor_SMD:R_01005_0402Metric_Pad0.57x0.30mm_HandSolder",
+    "0201" : "Resistor_SMD:R_0201_0603Metric;Resistor_SMD:R_0201_0603Metric_Pad0.64x0.40mm_HandSolder",
+    "0402" : "Resistor_SMD:R_0402_1005Metric;Resistor_SMD:R_0402_1005Metric_Pad0.72x0.64mm_HandSolder",
+    "0603" : "Resistor_SMD:R_0603_1608Metric;Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder",
+    "0805" : "Resistor_SMD:R_0805_2012Metric;Resistor_SMD:R_0805_2012Metric_Pad1.20x1.40mm_HandSolder",
+    "1206" : "Resistor_SMD:R_1206_3216Metric;Resistor_SMD:R_1206_3216Metric_Pad1.30x1.75mm_HandSolder",
+    "1210" : "Resistor_SMD:R_1210_3225Metric;Resistor_SMD:R_1210_3225Metric_Pad1.30x2.65mm_HandSolder",
+    "1218" : "Resistor_SMD:R_1218_3246Metric;Resistor_SMD:R_1218_3246Metric_Pad1.22x4.75mm_HandSolder",
+    "2010" : "Resistor_SMD:R_2010_5025Metric;Resistor_SMD:R_2010_5025Metric_Pad1.40x2.65mm_HandSolder",
+    "2512" : "Resistor_SMD:R_2512_6332Metric;Resistor_SMD:R_2512_6332Metric_Pad1.40x3.35mm_HandSolder",
     }
 
 part_id_prefix = "PR1-"
